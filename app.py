@@ -86,6 +86,12 @@ def user_input(user_question):
 
     print(response)
     st.write("Reply: ", response["output_text"])
+    if st.button("Translate to Tamil"):
+        translator = Translator()
+        translated_text = translator.translate(
+            response["output_text"], src="en", dest="ta"
+        )
+        st.write("Reply (Tamil): ", translated_text.text)
 
 
 # def record_and_transcribe(text):
