@@ -89,11 +89,7 @@ def user_input(user_question):
     st.write("Reply: ", response["output_text"])
 
 
-def record_and_transcribe():
-    with sr.Microphone() as source:
-        st.write("Please speak something...")
-        audio = recognizer.listen(source)
-
+def record_and_transcribe(text):
     try:
         text = recognizer.recognize_google(audio)
         # st.write("Transcribed text:", text)
@@ -131,17 +127,17 @@ def main():
     st.header("Agri Helpline Bot 🧑🏻‍🌾")
 
     user_question = st.text_input("Ask a question to your Agribot agent")
-    # voice_recording = mic_recorder(
-    #     start_prompt="Record Audio", stop_prompt="Stop recording", just_once=True
-    # )
-    # if voice_recording:
-    #     transcribed_audio = transcribe_audio(voice_recording["bytes"])
-    #     # user_input(transcribed_audio)
-    #     print(transcribed_audio)
-    if st.button("Record"):
-        record_and_transcribe()
-    if st.button("தமிழ்"):
-        record_and_transcribe_tamil()
+    text = speech_to_text(
+        language="en-US",  # Make sure to use a supported language code
+        start_prompt="English",  # Button text to start recording
+        stop_prompt="Stop recording",  # Button text to stop recording
+        just_once=True,  # Change to True if you want to limit it to one recording per session
+        use_container_width=False,
+    )
+    if text:
+        record_and_transcribe(text)
+    # if st.button("தமிழ்"):
+    #     record_and_transcribe_tamil()
     if user_question:
         user_input(user_question)
 
