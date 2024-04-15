@@ -5,9 +5,8 @@ import os
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import google.generativeai as genai
 import time
-from streamlit_mic_recorder import mic_recorder
 from googletrans import Translator
-
+from streamlit_mic_recorder import speech_to_text
 import speech_recognition as sr
 
 # Initialize the recognizer
@@ -89,37 +88,37 @@ def user_input(user_question):
     st.write("Reply: ", response["output_text"])
 
 
-def record_and_transcribe(text):
-    try:
-        text = recognizer.recognize_google(audio)
-        # st.write("Transcribed text:", text)
-        user_input(text)
-    except sr.UnknownValueError:
-        st.error("Sorry, could not understand the audio.")
-    except sr.RequestError:
-        st.error("Could not request results; check your internet connection.")
+# def record_and_transcribe(text):
+#     try:
+#         text = recognizer.recognize_google(audio)
+#         # st.write("Transcribed text:", text)
+#         user_input(text)
+#     except sr.UnknownValueError:
+#         st.error("Sorry, could not understand the audio.")
+#     except sr.RequestError:
+#         st.error("Could not request results; check your internet connection.")
 
 
-def record_and_transcribe_tamil():
-    with sr.Microphone() as source:
-        st.write("Please speak something...")
-        audio = recognizer.listen(source)
+# def record_and_transcribe_tamil():
+#     with sr.Microphone() as source:
+#         st.write("Please speak something...")
+#         audio = recognizer.listen(source)
 
-    try:
-        # Recognizing the Tamil speech
-        tamil_text = recognizer.recognize_google(audio, language="ta-IN")
-        print("Transcribed Tamil Text:", tamil_text)
+#     try:
+#         # Recognizing the Tamil speech
+#         tamil_text = recognizer.recognize_google(audio, language="ta-IN")
+#         print("Transcribed Tamil Text:", tamil_text)
 
-        # Translating to English
-        translated_text = translator.translate(tamil_text, dest="en")
-        # return translated_text.text
-        user_input(translated_text.text)
-    except sr.UnknownValueError:
-        print("Sorry, could not understand the audio.")
-    except sr.RequestError:
-        print("Could not request results; check your internet connection.")
-    except Exception as e:
-        print(f"An error occurred during translation: {e}")
+#         # Translating to English
+#         translated_text = translator.translate(tamil_text, dest="en")
+#         # return translated_text.text
+#         user_input(translated_text.text)
+#     except sr.UnknownValueError:
+#         print("Sorry, could not understand the audio.")
+#     except sr.RequestError:
+#         print("Could not request results; check your internet connection.")
+#     except Exception as e:
+#         print(f"An error occurred during translation: {e}")
 
 
 def main():
@@ -133,11 +132,22 @@ def main():
         stop_prompt="Stop recording",  # Button text to stop recording
         just_once=True,  # Change to True if you want to limit it to one recording per session
         use_container_width=False,
+        key="eng",
     )
+    tamil_text = speech_to_text(
+        language="ta-IN",  # Make sure to use a supported language code
+        start_prompt="தமிழ்",  # Button text to start recording
+        stop_prompt="Stop recording",  # Button text to stop recording
+        just_once=True,  # Change to True if you want to limit it to one recording per session
+        use_container_width=False,
+        key="tam",
+    )
+    if tamil_text:
+        translated_text = translator.translate(tamil_text, dest="en")
+        user_input(translated_text.text)
     if text:
-        record_and_transcribe(text)
-    # if st.button("தமிழ்"):
-    #     record_and_transcribe_tamil()
+        user_input(text)
+
     if user_question:
         user_input(user_question)
 
